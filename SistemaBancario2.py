@@ -1,9 +1,55 @@
 saldo_global = 0.00
 extrato_global = []
+usuarios = []
+contas = []
+numero_conta = 1
+
+def menu():
+    menu_inicial = '''
+-------------------------------------
+          Menu Inicial         
+-------------------------------------
+ Digite a opção desejada:
+                                       
+ [1] - Realizar Operações                   
+ [2] - Cadastrar Novo Usuário                        
+ [3] - Criar Conta Corrente                      
+ [4] - Sair                          
+-------------------------------------
+'''
+    global usuarios
+    global contas
+    global numero_conta
+    while True:
+        option = input(menu_inicial)
+        
+        if option == "1":
+            operacoes_bancarias()
+
+        elif option == "2":
+            novo_usuario = cadastro_usuario()
+            if novo_usuario == False:
+                pass
+            else:
+                usuarios.append(novo_usuario) 
+
+        elif option == "3":
+            nova_cc = cadastro_cc()
+            if nova_cc == False:
+                pass
+            else:
+                contas.append(nova_cc)
+                numero_conta += 1
+
+        elif option == "4":
+            print("\nObrigado por usar o sistema bancário da DIO\n")
+            break
+        else:
+            print("Opção inválida\nRepita a operação")   
 
 
-def Menu():
-    mensagem_menu = '''
+def operacoes_bancarias():
+    menu_operacoes = '''
 -------------------------------------
           Menu de operações          
 -------------------------------------
@@ -22,7 +68,7 @@ def Menu():
     limite_saques_user = 3
 
     while True:
-        option = input(mensagem_menu)
+        option = input(menu_operacoes)
         
         if option == "1":
             retorno_deposito = deposito(saldo_global)
@@ -44,12 +90,105 @@ def Menu():
             extrato(saldo_global, extrato= extrato_global)
 
         elif option == "4":
-            print("\nObrigado por usar o sistema bancário da DIO\n")
+            print("\nSaindo do Sistema de Operações...\n")
             break
         else:
             print("Opção inválida\nRepita a operação")
 
-def deposito(saldo: float):
+def cadastro_usuario():
+    global usuarios
+    print("\n| CPF do Usuário |")
+    while True:
+        cpf = input("Digite o CPF que deseja cadastrar:")
+
+        if len(cpf) == 11 and cpf.isdigit():
+            break
+        else: 
+            print("CPF inválido! digite um CPF com 11 números.")      
+
+    cpf_exist = False
+
+    for user in usuarios:
+        if user["cpf"] == cpf:
+            cpf_exist = True
+            break
+
+
+    if cpf_exist == False:
+        
+        print("\n| Nome do Usuário |")
+        nome = input("Digite o nome do usuário:")
+        
+        print("\n| Endereço do Usuário |")
+        rua = input("Digite o nome da Rua:")
+        numero = input("Digite o numero da moradia:")
+        bairro = input("Digite o bairro:")
+        cidade = input("Digite a cidade:")
+        estado = input("Digite a sigla do estado:")
+
+        adress = f"{rua}, {numero} - {bairro} - {cidade}/{estado}"
+
+        print("\n| Data de Nascimento do Usuário |")
+        while True:
+            dia = int(input("Digite o dia:"))
+            if  0 < dia <= 31: 
+                break
+            else:
+                print("Dia inválido! Digite novamente.")
+        while True:
+            mes = int(input("Digite o mes:"))
+            if  0 < mes <= 12: 
+                break
+            else:
+                print("Mes inválido! Digite novamente.")
+        while True:
+            ano = int(input("Digite o ano:"))
+            if  1900 < ano <= 2024: 
+                break
+            else:
+                print("Dia inválido! Digite novamente.")
+
+        data = f"{dia}/{mes}/{ano}"
+
+        new_user = {"cpf": cpf, "nome": nome, "endereco": adress, "data": data}
+        return new_user
+    else:
+        print ("\nUsuário já cadastrado no Sistema!")
+        return False
+    
+def cadastro_cc():
+    while True:
+        cpf_conta = input("Digite o cpf do usuário que deseja cadastrar a conta:")
+
+        if len(cpf_conta) == 11 and cpf_conta.isdigit:
+            break        
+        else:
+            print("CPF inválido! digite um CPF com 11 números.")
+
+    cpf_exist = False
+    for user in usuarios:
+        
+        if user["cpf"] == cpf_conta:
+                cpf_exist = True
+
+    if cpf_exist == True:
+        agencia = "0001"
+        global numero_conta
+        print(f"Novo usuario de CPF:{cpf_conta}, cadastrado na agência:{agencia} e conta de numero:{numero_conta}")
+        new_account = {"cpf": cpf_conta, "agencia": agencia, "conta": numero_conta}       
+        return new_account
+
+
+
+    else:
+        print("\nCPF sem cadastro, cadastre o usuário antes de criar uma conta corrente!")
+       
+        return False
+
+
+
+
+def deposito(saldo: float, /):
 
     print("Opção de Depósito selecionada:")
     valor = float(input("Digite o valor a ser depositado:"))
@@ -94,7 +233,7 @@ def saque(*, saldo: float, limite:float, contagem_saques: int, limite_saques: in
 
     return [operation_fail, saldo, extrato, contagem_saques]
 
-def extrato(saldo: float, *, extrato: list):
+def extrato(saldo: float, /, *, extrato: list):
     
     print("\n---------------Extrato---------------")
 
@@ -107,5 +246,4 @@ def extrato(saldo: float, *, extrato: list):
     print(f"\nSaldo disponível: R$ {saldo:.2f}")
     print("--------------------------------------")
 
-Menu()
-
+menu()
